@@ -80,6 +80,10 @@ function getDateFromRealeaseDate(imdbReleaseDate) {
 
 // /name/nm7368158/?ref_=tt_cl_i1
 function getActorIdmbIdFromHref(href) {
+    if (!href) {
+        return "";
+    }
+
     const words = href.split('/');
     return words[2];
 }

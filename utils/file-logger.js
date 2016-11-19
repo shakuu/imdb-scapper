@@ -3,8 +3,8 @@ const os = require("os");
 
 const config = require("../config/constants");
 
-function logError(err) {
-    fs.appendFile(config.errorLog, `${new Date().toString()} ${err.message}`, (err) => {
+function logError(loggedError) {
+    fs.appendFile(config.errorLog, `${new Date().toString()} ${loggedError.message}${os.EOL}`, (err) => {
         if (err) {
             console.log(err.message);
         }

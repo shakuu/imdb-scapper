@@ -16,7 +16,7 @@ function wait(time) {
 
 let index = 1;
 function getDetailedMovies() {
-    return simpleMovieData.findPage(index, 3)
+    return simpleMovieData.findPage(index, 30)
         .then((simpleMoviesFromMongoDb) => {
             if (simpleMoviesFromMongoDb.length === 0) {
                 console.log("end");
