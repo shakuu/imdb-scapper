@@ -4,6 +4,7 @@ const logger = require("../utils/file-logger");
 
 const httpRequester = require("../utils/http-requester");
 const htmlParser = require("../utils/html-parser");
+const modelsFactory = require("../models");
 
 function wait(time) {
     return new Promise((resolve) => {
@@ -30,6 +31,15 @@ function getDetailedMovies() {
                     return getDetailedMovieFromImdbUrl(url);
                 }));
         })
+        .then((movieObjects) => {
+            return modelsFactory.getDetailedMoviesFromArray(movieObjects);
+        })
+        .then((movies) => {
+            return modelsFactory.insertManyDetailedMovies(movies);
+        })
+        .then((movies) => {
+            logger.logOperation(`Inserted ${movies.length} movies.`);
+        })
         .then(() => {
             return wait(1000);
         })
@@ -51,7 +61,7 @@ function getDetailedMovieFromImdbUrl(url) {
         })
         .then((detailedMovieObject) => {
             logger.logOperation(url);
-            console.log(detailedMovieObject);
+            return detailedMovieObject;
         })
         .catch((err) => {
             logger.logError(err);
