@@ -1,5 +1,6 @@
 /* globals console require setTimeout Promise */
 'use strict';
+const dirtyDeeds = "Dirty Deeds";
 
 const httpRequester = require("./utils/http-requester");
 const htmlParser = require("./utils/html-parser");
@@ -9,53 +10,65 @@ const constants = require("./config/constants");
 
 require("./config/mongoose")(constants.connectionString);
 
-let urlsQueue = queuesFactory.getQueue();
+const simpleMovieData = require("./data/simple-user-data");
 
-function wait(time) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve();
-        }, time);
-    });
-}
-
-constants.genres.forEach(genre => {
-    for (let i = 0; i < constants.pagesCount; i += 1) {
-        let url = `http://www.imdb.com/search/title?genres=${genre}&title_type=feature&0sort=moviemeter,asc&page=${i+1}&view=simple&ref_=adv_nxt`;
-        urlsQueue.push(url);
-    }
-});
-
-function getMoviesFromUrl(url) {
-    console.log(`Working with ${url}`);
-    httpRequester.get(url)
-        .then((result) => {
-            const selector = ".col-title span[title] a";
-            const html = result.body;
-            return htmlParser.parseSimpleMovie(selector, html);
-        })
-        .then(movies => {
-            let dbMovies = movies.map(movie => {
-                return modelsFactory.getSimpleMovie(movie.title, movie.url);
-            });
-
-            modelsFactory.insertManySimpleMovies(dbMovies);
-
-            return wait(1000);
-        })
-        .then(() => {
-            if (urlsQueue.isEmpty()) {
-                return;
-            }
-
-            getMoviesFromUrl(urlsQueue.pop());
-        })
-        .catch((err) => {
-            console.dir(err, { colors: true });
+simpleMovieData.findPage(5, 50)
+    .then((movie) => {
+        movie.forEach(mov => {
+            console.log(mov.name);
         });
-}
+    })
+    .catch((err) => {
+        console.log(err.message);
+    });
 
-const asyncPagesCount = 15;
+// let urlsQueue = queuesFactory.getQueue();
 
-Array.from({ length: asyncPagesCount })
-    .forEach(() => getMoviesFromUrl(urlsQueue.pop()));
+// function wait(time) {
+//     return new Promise((resolve) => {
+//         setTimeout(() => {
+//             resolve();
+//         }, time);
+//     });
+// }
+
+// constants.genres.forEach(genre => {
+//     for (let i = 0; i < constants.pagesCount; i += 1) {
+//         let url = `http://www.imdb.com/search/title?genres=${genre}&title_type=feature&0sort=moviemeter,asc&page=${i+1}&view=simple&ref_=adv_nxt`;
+//         urlsQueue.push(url);
+//     }
+// });
+
+// function getMoviesFromUrl(url) {
+//     console.log(`Working with ${url}`);
+//     httpRequester.get(url)
+//         .then((result) => {
+//             const selector = ".col-title span[title] a";
+//             const html = result.body;
+//             return htmlParser.parseSimpleMovie(selector, html);
+//         })
+//         .then(movies => {
+//             let dbMovies = movies.map(movie => {
+//                 return modelsFactory.getSimpleMovie(movie.title, movie.url);
+//             });
+
+//             modelsFactory.insertManySimpleMovies(dbMovies);
+
+//             return wait(1000);
+//         })
+//         .then(() => {
+//             if (urlsQueue.isEmpty()) {
+//                 return;
+//             }
+
+//             getMoviesFromUrl(urlsQueue.pop());
+//         })
+//         .catch((err) => {
+//             console.dir(err, { colors: true });
+//         });
+// }
+
+// const asyncPagesCount = 15;
+
+// Array.from({ length: asyncPagesCount })
+//     .forEach(() => getMoviesFromUrl(urlsQueue.pop()));
