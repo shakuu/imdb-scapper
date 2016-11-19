@@ -12,9 +12,9 @@ const logger = require("./utils/file-logger");
 
 const scrappers = require("./scrappers");
 
-scrappers.getDetailedMovies();
-
 require("./config/mongoose")(constants.connectionString);
+
+scrappers.getDetailedMovies();
 
 // const simpleMovieData = require("./data/simple-user-data");
 

@@ -3,14 +3,19 @@ const urlQueueProvider = require("../utils/url-queue-provider");
 const logger = require("../utils/file-logger");
 
 const httpRequester = require("../utils/http-requester");
+const htmlParser = require("../utils/html-parser");
 
-function getDetailedMovies(options) {
-    options.pageSize = options.pageSize || 10;
-    options.pagesCount = options.pageNumber || 0;
+function wait(time) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, time);
+    });
+}
 
-    simpleUserData.findPage(1, 10)
+function getDetailedMovies() {
+    simpleUserData.findPage(30, 3)
         .then((movie) => {
-            console.log(movie);
             return urlQueueProvider.getUrlQueueFromSimpleMovies(movie);
         })
         .then((urlQueue) => {
@@ -24,9 +29,15 @@ function getDetailedMovies(options) {
 }
 
 function getDetailedMovieFromImdbUrl(url) {
+    logger.logOperation(url);
+
     httpRequester.get(url)
         .then((result) => {
-            const html = result.body;
+            return htmlParser.parseDetailedMovie(result.body);
+        })
+        .then((detailedMovieObject) => {
+            logger.logOperation(url);
+            console.log(detailedMovieObject);
         })
         .catch((err) => {
             logger.logError(err);
