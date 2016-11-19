@@ -10,20 +10,24 @@ const constants = require("./config/constants");
 
 const logger = require("./utils/file-logger");
 
+const scrappers = require("./scrappers");
+
+scrappers.getDetailedMovies();
+
 require("./config/mongoose")(constants.connectionString);
 
-const simpleMovieData = require("./data/simple-user-data");
+// const simpleMovieData = require("./data/simple-user-data");
 
-simpleMovieData.findPage(5, 50)
-    .then((movie) => {
-        logger.logOperation(movie.length);
-        movie.forEach(mov => {
-            console.log(mov.name);
-        });
-    })
-    .catch((err) => {
-        logger.logError(err);
-    });
+// simpleMovieData.findPage(5, 50)
+//     .then((movie) => {
+//         logger.logOperation(movie.length);
+//         movie.forEach(mov => {
+//             console.log(mov.name);
+//         });
+//     })
+//     .catch((err) => {
+//         logger.logError(err);
+//     });
 
 // let urlsQueue = queuesFactory.getQueue();
 

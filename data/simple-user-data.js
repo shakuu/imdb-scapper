@@ -2,7 +2,7 @@ const SimpleMovie = require("../models/simple-movie-model");
 
 function findByName(name) {
     const promise = new Promise((resolve, reject) => {
-        SimpleMovie.find({ name }, (err, response) => {
+        SimpleMovie.find({ name: new RegExp(name, "i") }, (err, response) => {
             if (err) {
                 return reject(err);
             }
