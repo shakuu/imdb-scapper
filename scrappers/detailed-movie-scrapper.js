@@ -14,9 +14,9 @@ function wait(time) {
     });
 }
 
-let index = 1;
+let index = 50;
 function getDetailedMovies() {
-    return simpleMovieData.findPage(index, 30)
+    return simpleMovieData.findPage(index, 3)
         .then((simpleMoviesFromMongoDb) => {
             if (simpleMoviesFromMongoDb.length === 0) {
                 console.log("end");
