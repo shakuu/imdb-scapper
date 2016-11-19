@@ -1,8 +1,8 @@
-const DetailedMovie = require("../models/detailed-movie.model");
+const Actor = require("../models/actor-model");
 
 function findByName(name) {
     const promise = new Promise((resolve, reject) => {
-        DetailedMovie.find({ title: new RegExp(name, "i") }, (err, response) => {
+        Actor.find({ title: new RegExp(name, "i") }, (err, response) => {
             if (err) {
                 return reject(err);
             }
@@ -16,7 +16,7 @@ function findByName(name) {
 
 function findAll() {
     const promise = new Promise((resolve, reject) => {
-        DetailedMovie.find({}, (err, res) => {
+        Actor.find({}, (err, res) => {
             if (err) {
                 return reject(err);
             }

@@ -1,7 +1,5 @@
 /* globals console require setTimeout Promise */
 'use strict';
-const dirtyDeeds = "Dirty Deeds";
-
 const httpRequester = require("./utils/http-requester");
 const htmlParser = require("./utils/html-parser");
 const queuesFactory = require("./data-structures/queue");
@@ -79,7 +77,7 @@ require("./config/mongoose")(constants.connectionString);
 // Array.from({ length: asyncPagesCount })
 //     .forEach(() => getMoviesFromUrl(urlsQueue.pop()));
 
-scrappers.getDetailedMovies()
-    .then(() => {
-        console.log("the end");
-    });
+// scrappers.getDetailedMovies()
+//     .then(() => {
+//         console.log("the end");
+//     });
