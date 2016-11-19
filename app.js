@@ -14,7 +14,7 @@ require("./config/mongoose")(constants.connectionString);
 
 const simpleMovieData = require("./data/simple-user-data");
 
-simpleMovieData.findPage(-150, -1450)
+simpleMovieData.findPage(5, 50)
     .then((movie) => {
         logger.logOperation(movie.length);
         movie.forEach(mov => {
