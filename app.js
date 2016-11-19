@@ -8,18 +8,21 @@ const queuesFactory = require("./data-structures/queue");
 const modelsFactory = require("./models");
 const constants = require("./config/constants");
 
+const logger = require("./utils/file-logger");
+
 require("./config/mongoose")(constants.connectionString);
 
 const simpleMovieData = require("./data/simple-user-data");
 
-simpleMovieData.findPage(5, 50)
+simpleMovieData.findPage(-150, -1450)
     .then((movie) => {
+        logger.logOperation(movie.length);
         movie.forEach(mov => {
             console.log(mov.name);
         });
     })
     .catch((err) => {
-        console.log(err.message);
+        logger.logError(err);
     });
 
 // let urlsQueue = queuesFactory.getQueue();
