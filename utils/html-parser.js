@@ -63,7 +63,11 @@ module.exports.parseDetailedMovie = function (html) {
 
     movie.actors = actors;
 
-    return movie;
+    $("body").html("");
+    return Promise.resolve()
+        .then(() => {
+            return movie;
+        });
 };
 
 function getDateFromRealeaseDate(imdbReleaseDate) {
@@ -81,6 +85,10 @@ function getActorIdmbIdFromHref(href) {
 }
 
 function splitGenresFromImdbGenresHtml(genresFromHtml) {
+    if (!genresFromHtml || genresFromHtml.length === 0) {
+        return [];
+    }
+
     const genresList = [],
         genresChars = genresFromHtml.split('');
 

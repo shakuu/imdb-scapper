@@ -1,4 +1,4 @@
-const simpleUserData = require("../data/simple-user-data");
+const simpleMovieData = require("../data/simple-user-data");
 const urlQueueProvider = require("../utils/url-queue-provider");
 const logger = require("../utils/file-logger");
 
@@ -13,15 +13,29 @@ function wait(time) {
     });
 }
 
+let index = 1;
 function getDetailedMovies() {
-    simpleUserData.findPage(30, 3)
-        .then((movie) => {
-            return urlQueueProvider.getUrlQueueFromSimpleMovies(movie);
+    return simpleMovieData.findPage(index, 3)
+        .then((simpleMoviesFromMongoDb) => {
+            if (simpleMoviesFromMongoDb.length === 0) {
+                console.log("end");
+                return null;
+            }
+
+            return urlQueueProvider.getUrlQueueFromSimpleMovies(simpleMoviesFromMongoDb);
         })
         .then((urlQueue) => {
-            while (!urlQueue.isEmpty()) {
-                getDetailedMovieFromImdbUrl(urlQueue.pop());
-            }
+            return Promise.all(
+                urlQueue.items.map(url => {
+                    return getDetailedMovieFromImdbUrl(url);
+                }));
+        })
+        .then(() => {
+            return wait(1000);
+        })
+        .then(() => {
+            index += 1;
+            return getDetailedMovies();
         })
         .catch((err) => {
             logger.logError(err);
@@ -31,7 +45,7 @@ function getDetailedMovies() {
 function getDetailedMovieFromImdbUrl(url) {
     logger.logOperation(url);
 
-    httpRequester.get(url)
+    return httpRequester.get(url)
         .then((result) => {
             return htmlParser.parseDetailedMovie(result.body);
         })

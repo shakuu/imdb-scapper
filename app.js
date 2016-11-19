@@ -14,7 +14,10 @@ const scrappers = require("./scrappers");
 
 require("./config/mongoose")(constants.connectionString);
 
-scrappers.getDetailedMovies();
+scrappers.getDetailedMovies()
+    .then(() => {
+        console.log("the end");
+    });
 
 // const simpleMovieData = require("./data/simple-user-data");
 
