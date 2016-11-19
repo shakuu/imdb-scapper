@@ -53,14 +53,14 @@ function getDetailedMovies() {
 }
 
 function getDetailedMovieFromImdbUrl(url) {
-    logger.logOperation(url);
+    logger.logOperation(`Starting ${url}`);
 
     return httpRequester.get(url)
         .then((result) => {
             return htmlParser.parseDetailedMovie(result.body);
         })
         .then((detailedMovieObject) => {
-            logger.logOperation(url);
+            logger.logOperation(`Finished ${url}`);
             return detailedMovieObject;
         })
         .catch((err) => {

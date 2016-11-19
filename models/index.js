@@ -17,13 +17,13 @@ module.exports = {
             detailedMovies.push(detailedMovie);
         });
 
-        Promise.resolve()
+        return Promise.resolve()
             .then(() => {
                 return detailedMovies;
             });
     },
     insertManyDetailedMovies(movies) {
-        Promise.resolve()
+        return Promise.resolve()
             .then(() => {
                 DetailedMovie.insertMany(movies);
                 return movies;
