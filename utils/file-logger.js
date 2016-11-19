@@ -1,12 +1,14 @@
 const fs = require("fs");
 const os = require("os");
 
+const config = require("../config/constants");
+
 function logError(err) {
-    fs.appendFile("errors.log", `${new Date().toString()} ${err.message}`);
+    fs.appendFile(config.errorLog, `${new Date().toString()} ${err.message}`);
 }
 
 function logOperation(url) {
-    fs.appendFile("parsed-urls.log", `${new Date().toString()} ${url}${os.EOL}`);
+    fs.appendFile(config.operationsLog, `${new Date().toString()} ${url}${os.EOL}`);
 }
 
 module.exports = {
