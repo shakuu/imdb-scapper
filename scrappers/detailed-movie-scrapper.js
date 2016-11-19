@@ -15,9 +15,9 @@ function wait(time) {
     });
 }
 
-let index = 50;
+let index = 1;
 function getDetailedMovies() {
-    return simpleMovieData.findPage(index, 5)
+    return simpleMovieData.findPage(index, 30)
         .then((simpleMoviesFromMongoDb) => {
             if (simpleMoviesFromMongoDb.length === 0) {
                 console.log("end");
@@ -27,6 +27,11 @@ function getDetailedMovies() {
             return filterExistingMovies(simpleMoviesFromMongoDb);
         })
         .then((filteredMovies) => {
+            if (filteredMovies.length === 0) {
+                index += 1;
+                return getDetailedMovies();
+            }
+
             return urlQueueProvider.getUrlQueueFromSimpleMovies(filteredMovies);
         })
         .then((urlQueue) => {

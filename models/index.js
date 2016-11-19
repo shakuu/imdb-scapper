@@ -25,12 +25,16 @@ module.exports = {
     insertManyDetailedMovies(movies) {
         return Promise.resolve()
             .then(() => {
+                if (movies.length === 0) {
+                    return null;
+                }
+
                 DetailedMovie.insertMany(movies, (err, res) => {
                     if (err) {
                         throw err;
                     }
                 });
-                
+
                 return movies;
             });
     }

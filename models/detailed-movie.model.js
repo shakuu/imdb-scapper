@@ -9,7 +9,8 @@ const actorSchema = new Schema({
     name: String,
     character: String,
     imdbId: String,
-    image: String
+    image: String,
+    url: String
 });
 
 const detailedMovieSchema = new Schema({

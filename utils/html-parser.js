@@ -55,7 +55,8 @@ module.exports.parseDetailedMovie = function (html) {
             name: parsedName,
             character: parsedCharacter,
             imdbId: parsedImdbId,
-            image: parsedImage
+            image: parsedImage,
+            url: row.find('td[itemprop="actor"] a').attr('href')
         };
 
         actors.push(actor);
