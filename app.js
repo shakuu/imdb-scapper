@@ -14,11 +14,7 @@ const scrappers = require("./scrappers");
 
 require("./config/mongoose")(constants.connectionString);
 
-scrappers.getDetailedMovies()
-    .then(() => {
-        console.log("the end");
-    });
-
+// Run this if your mongodb has no simplemovies
 // const simpleMovieData = require("./data/simple-user-data");
 
 // simpleMovieData.findPage(5, 50)
@@ -82,3 +78,8 @@ scrappers.getDetailedMovies()
 
 // Array.from({ length: asyncPagesCount })
 //     .forEach(() => getMoviesFromUrl(urlsQueue.pop()));
+
+scrappers.getDetailedMovies()
+    .then(() => {
+        console.log("the end");
+    });

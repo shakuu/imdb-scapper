@@ -25,7 +25,12 @@ module.exports = {
     insertManyDetailedMovies(movies) {
         return Promise.resolve()
             .then(() => {
-                DetailedMovie.insertMany(movies);
+                DetailedMovie.insertMany(movies, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                });
+                
                 return movies;
             });
     }

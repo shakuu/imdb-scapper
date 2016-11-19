@@ -5,6 +5,7 @@ const logger = require("../utils/file-logger");
 const httpRequester = require("../utils/http-requester");
 const htmlParser = require("../utils/html-parser");
 const modelsFactory = require("../models");
+const detailedMoviesData = require("../data/detailed-user-data");
 
 function wait(time) {
     return new Promise((resolve) => {
@@ -16,14 +17,17 @@ function wait(time) {
 
 let index = 50;
 function getDetailedMovies() {
-    return simpleMovieData.findPage(index, 3)
+    return simpleMovieData.findPage(index, 5)
         .then((simpleMoviesFromMongoDb) => {
             if (simpleMoviesFromMongoDb.length === 0) {
                 console.log("end");
                 return null;
             }
 
-            return urlQueueProvider.getUrlQueueFromSimpleMovies(simpleMoviesFromMongoDb);
+            return filterExistingMovies(simpleMoviesFromMongoDb);
+        })
+        .then((filteredMovies) => {
+            return urlQueueProvider.getUrlQueueFromSimpleMovies(filteredMovies);
         })
         .then((urlQueue) => {
             return Promise.all(
@@ -65,6 +69,25 @@ function getDetailedMovieFromImdbUrl(url) {
         })
         .catch((err) => {
             logger.logError(err);
+        });
+}
+
+function filterExistingMovies(movies) {
+    const filteredMovies = [];
+    return Promise.all(
+        movies.map(m => {
+            return detailedMoviesData.findByName(m.name);
+        }))
+        .then((results) => {
+            results.forEach((r, i) => {
+                if (r.length === 0) {
+                    filteredMovies.push(movies[i]);
+                } else {
+                    logger.logOperation(`${new Date().toString()} Exising movie ${movies[i].name}`);
+                }
+            });
+
+            return filteredMovies;
         });
 }
 
