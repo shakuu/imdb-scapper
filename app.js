@@ -6,10 +6,10 @@ const htmlParser = require('./utils/html-parser');
 const queuesFactory = require('./data-structures/queue');
 const modelsFactory = require('./models');
 const constants = require('./config/constants');
+const getAllSimpleMovies = require('./data/simple-movie-data');
+const urlBuilder = require('./utils/url-builder');
 
 require('./config/mongoose')(constants.connectionString);
-
-let urlsQueue = queuesFactory.getQueue();
 
 function wait(time) {
     return new Promise((resolve) => {
@@ -19,6 +19,7 @@ function wait(time) {
     });
 }
 
+// let urlsQueue = queuesFactory.getQueue();
 //
 // constants.genres.forEach(genre => {
 //     for (let i = 0; i < constants.pagesCount; i += 1) {
@@ -63,18 +64,12 @@ function wait(time) {
 
 //
 
-const getAllSimpleMovies = require('./data/simple-movie-data');
-
-let simpleMoviesQueue = queuesFactory.getQueue();
-let allSimpleMovies = [];
 getAllSimpleMovies()
-    .then((res) => {
-        allSimpleMovies = res;
-
+    .then((allSimpleMovies) => {
+        let simpleMoviesQueue = queuesFactory.getQueue();
         allSimpleMovies.forEach(movie => {
-            let url = `http://www.imdb.com/title/${movie.imdbId}/?ref_=adv_li_tt`;
+            let url = urlBuilder.getDetailedMovedImdbUrl(movie.imdbId);
             simpleMoviesQueue.push(url);
-
         });
 
         return simpleMoviesQueue;
@@ -83,13 +78,14 @@ getAllSimpleMovies()
         const asyncDetailsPagesCount = 15;
 
         Array.from({ length: asyncDetailsPagesCount })
-            .forEach(() => getDetailedMoviesFromUrl(urlQueue.pop()));
+            .forEach(() => getDetailedMoviesFromUrl(urlQueue));
     })
     .catch((err) => {
         console.log(err.message);
     });
 
-function getDetailedMoviesFromUrl(url) {
+function getDetailedMoviesFromUrl(urlQueue) {
+    const url = urlQueue.pop();
     console.log(`Working with ${url}`);
     httpRequester.get(url)
         .then((html) => {
@@ -98,16 +94,15 @@ function getDetailedMoviesFromUrl(url) {
         })
         .then(movie => {
             const detailedMovie = modelsFactory.getDetailedMovie(movie);
-
             modelsFactory.insertDetailedMovie(detailedMovie);
             return wait(1000);
         })
         .then(() => {
-            if (simpleMoviesQueue.isEmpty()) {
+            if (urlQueue.isEmpty()) {
                 return;
             }
 
-            getDetailedMoviesFromUrl(simpleMoviesQueue.pop());
+            getDetailedMoviesFromUrl(urlQueue);
         })
         .catch((err) => {
             console.dir(err, { colors: true });
