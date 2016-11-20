@@ -40,17 +40,24 @@ function getActors() {
             return filterExistingActors(filteredActors);
         })
         .then((existingActors) => {
-            if (existingActors.length === 0) {
-                return getActors();
-            }
+            const actors = existingActors.map(a => modelsFactory.getActor(a));
+            return modelsFactory.insertManyActors(actors);
+        })
+        .then((actors) => {
+            logger.logOperation(`${new Date().toString()} Inserted ${actors.length} actors.`);
+        })
+        // .then((existingActors) => {
+        //     if (existingActors.length === 0) {
+        //         return getActors();
+        //     }
 
-            return urlQueueProvider.getUrlQueueForActors(existingActors);
-        })
-        .then((urlQueue) => {
-            actorsUrlQueue = urlQueue;
-            Array.from({ length: 15 })
-                .forEach(_ => getActorFromImdbUrl(actorsUrlQueue.pop()));
-        })
+        //     return urlQueueProvider.getUrlQueueForActors(existingActors);
+        // })
+        // .then((urlQueue) => {
+        //     actorsUrlQueue = urlQueue;
+        //     Array.from({ length: 15 })
+        //         .forEach(_ => getActorFromImdbUrl(actorsUrlQueue.pop()));
+        // })
         .catch((err) => {
             logger.logError(err);
         });
