@@ -23,7 +23,8 @@ function getActors() {
                 return null;
             }
 
-            return filterExistingActors(detailedMovies);
+            // TODO: Aggregate actors from each movie
+            return filterExistingActors(detailedMovies.actors);
         })
         .then((existingActors) => {
             if (existingActors.length === 0) {

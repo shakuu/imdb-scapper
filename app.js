@@ -81,3 +81,11 @@ require("./config/mongoose")(constants.connectionString);
 //     .then(() => {
 //         console.log("the end");
 //     });
+
+scrappers.getActors()
+    .then(() => {
+        console.log("done");
+    })
+    .catch((err) => {
+        logger.logError(err);
+    });
