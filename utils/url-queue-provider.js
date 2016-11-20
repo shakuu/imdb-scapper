@@ -18,7 +18,7 @@ function getUrlQueueForActors(actors) {
     const promise = new Promise((resolve) => {
         const urlQueue = queueFactory.getQueue();
         actors.forEach(a => {
-            const movieImdbUrl = a.url;
+            const movieImdbUrl = getActorUrl(a.url);
             urlQueue.push(movieImdbUrl);
         });
 
@@ -26,6 +26,10 @@ function getUrlQueueForActors(actors) {
     });
 
     return promise;
+}
+
+function getActorUrl(actorUrl) {
+    return `http://www.imdb.com${actorUrl}`;
 }
 
 // /title/tt0067992/?ref_=adv_li_tt

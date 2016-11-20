@@ -15,6 +15,7 @@ function wait(time) {
     });
 }
 
+let actorsUrlQueue = [];
 function getActors() {
     return detailedMoviesData.findAll()
         .then((detailedMovies) => {
@@ -23,8 +24,20 @@ function getActors() {
                 return null;
             }
 
-            // TODO: Aggregate actors from each movie
-            return filterExistingActors(detailedMovies.actors);
+            const allActors = [];
+            detailedMovies.forEach(m => {
+                allActors.push(...m.actors);
+            });
+
+            const filteredActors = [];
+            allActors.forEach(a => {
+                const exists = filteredActors.some(fa => fa.name === a.name);
+                if (!exists) {
+                    filteredActors.push(a);
+                }
+            });
+
+            return filterExistingActors(filteredActors);
         })
         .then((existingActors) => {
             if (existingActors.length === 0) {
@@ -34,42 +47,43 @@ function getActors() {
             return urlQueueProvider.getUrlQueueForActors(existingActors);
         })
         .then((urlQueue) => {
-            return Promise.all(
-                urlQueue.items.map(url => {
-                    return getActorFromImdbUrl(url);
-                }));
-        })
-        .then((movieObjects) => {
-            return modelsFactory.getDetailedMoviesFromArray(movieObjects);
-        })
-        .then((movies) => {
-            return modelsFactory.insertManyDetailedMovies(movies);
-        })
-        .then((movies) => {
-            logger.logOperation(`Inserted ${movies.length} movies.`);
-        })
-        .then(() => {
-            return wait(1000);
-        })
-        .then(() => {
-            return getActors();
+            actorsUrlQueue = urlQueue;
+            Array.from({ length: 15 })
+                .forEach(_ => getActorFromImdbUrl(actorsUrlQueue.pop()));
         })
         .catch((err) => {
             logger.logError(err);
         });
 }
 
-// TODO:
 function getActorFromImdbUrl(url) {
     logger.logOperation(`Starting ${url}`);
 
     return httpRequester.get(url)
         .then((result) => {
+            // TODO:
             return htmlParser.parseDetailedMovie(result.body);
         })
-        .then((detailedMovieObject) => {
-            logger.logOperation(`Finished ${url}`);
-            return detailedMovieObject;
+        .then((actorFromHtml) => {
+            const mongoActor = modelsFactory.getActor(actorFromHtml);
+            return mongoActor;
+        })
+        .then((actor) => {
+            return modelsFactory.insertManyActors([actor]);
+        })
+        .then((actors) => {
+            logger.logOperation(`Finished ${actors[0].name}`);
+        })
+        .then(() => {
+            return wait(1000);
+        })
+        .then(() => {
+            if (actorsUrlQueue.isEmpty) {
+                logger.logOperation(`${new Date().toString()} Actors url finished.`);
+                return;
+            }
+
+            getActorFromImdbUrl(actorsUrlQueue.pop());
         })
         .catch((err) => {
             logger.logError(err);
